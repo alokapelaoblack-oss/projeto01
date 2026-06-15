@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Nubank</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --purple: #8A05BE;
+      --purple-dark: #6b04a0;
+      --purple-mid: #7a04ae;
+      --bg: #111111;
+      --card: #1E1E1E;
+      --card2: #252525;
+      --text: #FFFFFF;
+      --text-muted: #AAAAAA;
+      --separator: #2a2a2a;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000000;
+    }
+
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 390px;
+      margin: 0 auto;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ─── STATUS BAR ─── */
+    .status-bar {
+      background: var(--purple);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px 8px;
+      height: 44px;
+    }
+    .sb-left {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .sb-signal {
+      display: flex; align-items: flex-end; gap: 2px; height: 11px; margin-right: 1px;
+    }
+    .sb-signal span {
+      display: block; width: 3px; background: rgba(255,255,255,0.4); border-radius: 1px;
+    }
+    .sb-signal span.active { background: #fff; }
+    .sb-signal span:nth-child(1) { height: 3px; }
+    .sb-signal span:nth-child(2) { height: 5px; }
+    .sb-signal span:nth-child(3) { height: 8px; }
+    .sb-signal span:nth-child(4) { height: 11px; }
+    .sb-carrier {
+      font-size: 12px; font-weight: 600; color: #fff; letter-spacing: 0.3px;
+    }
+    .sb-wifi { display: flex; align-items: center; margin-left: 2px; }
+    .sb-time {
+      font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.2px;
+    }
+    .sb-right {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .sb-headphones { display: flex; align-items: center; }
+    .sb-battery-wrap { display: flex; align-items: center; gap: 3px; }
+    .sb-pct { font-size: 12px; font-weight: 600; color: #fff; }
+    .sb-battery {
+      position: relative; width: 25px; height: 12px;
+      border: 1.5px solid rgba(255,255,255,0.8); border-radius: 3px;
+    }
+    .sb-battery::after {
+      content: ''; position: absolute;
+      right: -4px; top: 50%; transform: translateY(-50%);
+      width: 2.5px; height: 5px;
+      background: rgba(255,255,255,0.8); border-radius: 0 1px 1px 0;
+    }
+    .sb-battery-fill {
+      height: 100%; width: 78%; background: #fff; border-radius: 1.5px;
+    }
+
+    /* ─── PURPLE HEADER AREA ─── */
+    .header-area {
+      background: var(--purple);
+      padding: 10px 20px 0;
+      border-radius: 0 0 28px 28px;
+      padding-bottom: 26px;
+    }
+
+    /* top row: avatar + icons */
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .avatar-wrap { position: relative; cursor: pointer; }
+    .avatar-circle {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .avatar-circle svg { width: 28px; height: 28px; }
+    .notif-dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #fff;
+      border: 2.5px solid var(--purple);
+      position: absolute; top: 0; right: 0;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 22px; }
+    .hbtn {
+      background: none; border: none; cursor: pointer; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hbtn svg { width: 26px; height: 26px; }
+
+    /* greeting */
+    .greeting { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+
+    /* ─── DARK BODY ─── */
+    .body-area { background: var(--bg); }
+
+    /* ─── ACCOUNT SECTION ─── */
+    .account-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 20px 6px;
+    }
+    /* FIX: classe account-left estava sem estilo definido */
+    .account-left {
+      display: flex; flex-direction: column;
+    }
+    .account-title {
+      font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 2px;
+    }
+    .account-balance {
+      font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.3px;
+    }
+    .account-chevron { padding: 4px; cursor: pointer; }
+    /* FIX: stroke agora é herdado via currentColor e explicitado no SVG inline */
+    .account-chevron svg { width: 18px; height: 18px; }
+
+    /* ─── QUICK ACTIONS ─── */
+    .actions-scroll {
+      display: flex; align-items: flex-start; gap: 0;
+      overflow-x: auto; scrollbar-width: none;
+      padding: 18px 0 18px 20px;
+    }
+    .actions-scroll::-webkit-scrollbar { display: none; }
+
+    .act {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; cursor: pointer; flex-shrink: 0;
+      padding-right: 22px;
+    }
+    .act-btn {
+      width: 62px; height: 62px; border-radius: 50%;
+      background: #2a2a2a;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.12s;
+    }
+    .act-btn:active { background: #000000; }
+    .act-btn svg { width: 26px; height: 26px; }
+    .act-label {
+      font-size: 12.5px; font-weight: 600; color: #fff;
+      white-space: nowrap; text-align: center;
+    }
+
+    /* separator line */
+    .sep {
+      height: 1px; background: var(--separator);
+      margin: 0 0;
+    }
+
+    /* ─── LIST CARDS ─── */
+    .cards-area { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    .lcard {
+      background: #222;
+      border-radius: 14px;
+      padding: 17px 18px;
+      display: flex; align-items: center;
+      gap: 16px; cursor: pointer;
+      transition: background 0.12s;
+    }
+    .lcard:active { background: #2a2a2a; }
+
+    .lcard-icon {
+      width: 32px; height: 32px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lcard-icon svg { width: 26px; height: 26px; }
+    .lcard-label { font-size: 15px; font-weight: 600; color: #fff; flex: 1; }
+    .lcard-value { font-size: 14px; font-weight: 600; color: #ccc; }
+
+    /* ─── SECTION HEADER ─── */
+    .section-hdr {
+      font-size: 18px; font-weight: 800; color: #fff;
+      padding: 14px 16px 10px;
+    }
+
+    /* ─── ASSIST CARD ─── */
+    .assist-card {
+      background: #222;
+      border-radius: 14px;
+      margin: 0 16px;
+      padding: 17px 18px;
+      display: flex; align-items: center;
+      gap: 16px; cursor: pointer;
+      transition: background 0.12s;
+    }
+    .assist-card:active { background: #2a2a2a; }
+    .assist-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+    .assist-icon svg { width: 26px; height: 26px; }
+    .assist-label { font-size: 15px; font-weight: 700; color: #fff; }
+
+    /* bottom padding */
+    .bottom-pad { height: 32px; }
+  </style>
+</head>
+<body>
+
+<!-- ══ STATUS BAR ══ -->
+<div class="status-bar">
+  <div class="sb-left">
+    <div class="sb-signal">
+      <span class="active"></span>
+      <span class="active"></span>
+      <span class="active"></span>
+      <span class="active"></span>
+    </div>
+    <span class="sb-carrier">VIVO</span>
+    <span class="sb-wifi">
+      <svg width="17" height="13" viewBox="0 0 20 15" fill="none">
+        <path d="M1 5C4 1.5 7 0 10 0s6 1.5 9 5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M3.5 8.5C5.5 6 7.5 5 10 5s4.5 1 6.5 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M6.5 11.5C7.5 10 8.7 9.2 10 9.2s2.5.8 3.5 2.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="10" cy="14" r="1.3" fill="#fff"/>
+      </svg>
+    </span>
+  </div>
+
+  <span class="sb-time">07:44</span>
+
+  <div class="sb-right">
+    <span class="sb-headphones">
+      <svg width="16" height="14" viewBox="0 0 22 18" fill="none">
+        <path d="M3 11V9a8 8 0 0116 0v2" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="1" y="11" width="4" height="6" rx="2" fill="#fff"/>
+        <rect x="17" y="11" width="4" height="6" rx="2" fill="#fff"/>
+      </svg>
+    </span>
+    <div class="sb-battery-wrap">
+      <span class="sb-pct">78%</span>
+      <div class="sb-battery">
+        <div class="sb-battery-fill"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PURPLE HEADER ══ -->
+<div class="header-area">
+  <div class="header-row">
+    <div class="avatar-wrap">
+      <div class="avatar-circle">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.9)"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.9)"/>
+        </svg>
+      </div>
+      <div class="notif-dot"></div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Eye -->
+      <button class="hbtn" aria-label="Ocultar saldo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="12" rx="10" ry="7"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+
+      <!-- Question circle -->
+      <button class="hbtn" aria-label="Ajuda">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.2 9.2a3 3 0 115.6 1c-.4.8-1.4 1.3-1.8 2.1-.2.4-.2.7-.2 1.2"/>
+          <circle cx="12" cy="17" r=".7" fill="#fff" stroke="none"/>
+        </svg>
+      </button>
+
+      <!-- Person + envelope -->
+      <button class="hbtn" aria-label="Perfil e mensagens">
+        <svg viewBox="0 0 26 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="7.5" r="3.5"/>
+          <path d="M3 20c0-3.3 3.1-6 7-6"/>
+          <rect x="13" y="13" width="10" height="7" rx="1.5"/>
+          <path d="M13 14.5l5 3 5-3"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="greeting">Olá, Neuton</div>
+</div>
+
+<!-- ══ DARK BODY ══ -->
+<div class="body-area">
+
+  <!-- Account balance row -->
+  <div class="account-row">
+    <div class="account-left">
+      <div class="account-title">Conta</div>
+      <!-- FIX: formato correto do valor em reais (ponto para milhar, vírgula para decimal) -->
+      <div class="account-balance">R$ 1.000.146,22</div>
+    </div>
+    <div class="account-chevron">
+      <!-- FIX: stroke e fill adicionados diretamente no SVG para o chevron aparecer -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 6 15 12 9 18"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Quick action buttons -->
+  <div class="actions-scroll">
+
+    <!-- Área Pix -->
+    <div class="act">
+      <div class="act-btn">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M8.5 8.5 L13.9 13.9 Q15 15 16 15 Q17 15 18.1 13.9 L23.5 8.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M23.5 23.5 L18.1 18.1 Q17 17 16 17 Q15 17 13.9 18.1 L8.5 23.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.5 23.5 L3.1 18.1 Q2 17 2 16 Q2 15 3.1 13.9 L8.5 8.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M23.5 8.5 L28.9 13.9 Q30 15 30 16 Q30 17 28.9 18.1 L23.5 23.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="act-label">Área Pix</span>
+    </div>
+
+    <!-- Pagar (barcode) -->
+    <div class="act">
+      <div class="act-btn">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="4" width="20" height="18" rx="2" stroke-width="1.9"/>
+          <line x1="8" y1="9" x2="8" y2="17"/>
+          <line x1="11" y1="9" x2="11" y2="17"/>
+          <line x1="13.5" y1="9" x2="13.5" y2="17"/>
+          <line x1="16" y1="9" x2="16" y2="17"/>
+          <line x1="18.5" y1="9" x2="18.5" y2="17"/>
+        </svg>
+      </div>
+      <span class="act-label">Pagar</span>
+    </div>
+
+    <!-- Transferir (seta para cima) -->
+    <div class="act">
+      <div class="act-btn">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="8" width="20" height="14" rx="2"/>
+          <line x1="3" y1="13" x2="23" y2="13"/>
+          <line x1="13" y1="3" x2="13" y2="9"/>
+          <polyline points="10 6 13 3 16 6"/>
+        </svg>
+      </div>
+      <span class="act-label">Transferir</span>
+    </div>
+
+    <!-- FIX: Depositar agora usa seta apontando para BAIXO corretamente -->
+    <div class="act">
+      <div class="act-btn">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="8" width="20" height="14" rx="2"/>
+          <line x1="3" y1="13" x2="23" y2="13"/>
+          <line x1="13" y1="3" x2="13" y2="9"/>
+          <polyline points="10 6 13 9 16 6"/>
+        </svg>
+      </div>
+      <span class="act-label">Depositar</span>
+    </div>
+
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- List cards -->
+  <div class="cards-area">
+
+    <!-- Caixinhas -->
+    <div class="lcard">
+      <div class="lcard-icon">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="9" width="20" height="14" rx="3"/>
+          <path d="M8 9V7.5a5 5 0 0110 0V9"/>
+          <line x1="13" y1="13" x2="13" y2="19"/>
+          <line x1="10" y1="16" x2="16" y2="16"/>
+        </svg>
+      </div>
+      <span class="lcard-label">Caixinhas</span>
+      <span class="lcard-value">R$ 200,00</span>
+    </div>
+
+    <!-- Meus cartões -->
+    <div class="lcard">
+      <div class="lcard-icon">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="7" y="2" width="12" height="22" rx="2.5"/>
+          <line x1="7" y1="7" x2="19" y2="7"/>
+          <line x1="7" y1="19" x2="19" y2="19"/>
+          <circle cx="13" cy="21.5" r="0.8" fill="#fff" stroke="none"/>
+        </svg>
+      </div>
+      <span class="lcard-label">Meus cartões</span>
+    </div>
+
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- Section: Acompanhe também -->
+  <div class="section-hdr">Acompanhe também</div>
+
+  <!-- Assistente de pagamentos -->
+  <div class="assist-card">
+    <div class="assist-icon">
+      <svg viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="13" cy="13" r="10"/>
+        <path d="M9 13a4 4 0 0 0 7.5 1.9"/>
+        <path d="M17 13a4 4 0 0 0-7.5-1.9"/>
+        <polyline points="17 10.5 17 13 14.5 13"/>
+        <polyline points="9 15.5 9 13 11.5 13"/>
+      </svg>
+    </div>
+    <span class="assist-label">Assistente de pagamentos</span>
+  </div>
+
+  <div class="bottom-pad"></div>
+</div>
+
+</body>
+</html>
